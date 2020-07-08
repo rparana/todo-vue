@@ -1,6 +1,7 @@
 <template>
 	<div id="app">
 		<h1>Tarefas</h1>
+		<task-progress :progress="progress"/>
 		<new-task @taskAdded="addTask"/>
 		<TaskGrid :tasks="tasks" @taskDeleted="deleteTask" @taskStateChanged="toggleTaskState"/>
 	</div>
@@ -8,17 +9,34 @@
 
 <script>
 import NewTask from "./components/NewTask.vue";
+import TaskProgress from "./components/TasksProgress.vue";
 import TaskGrid from "./components/TaskGrid.vue";
 
 export default {
   components: {
     NewTask,
+    TaskProgress,
     TaskGrid,
   },
   data() {
     return {
       tasks: [],
     };
+  },
+  computed: {
+    progress() {
+      const total = this.tasks.length;
+      const done = this.tasks.filter((t) => !t.pending).length;
+      return Math.round((done / total) * 100) || 0;
+    },
+  },
+  watch: {
+    tasks: {
+      deep: true,
+      handler() {
+        localStorage.setItem("tasks", JSON.stringify(this.tasks));
+      },
+    },
   },
   methods: {
     addTask(task) {
@@ -37,6 +55,11 @@ export default {
     toggleTaskState(index) {
       this.tasks[index].pending = !this.tasks[index].pending;
     },
+  },
+  created() {
+    const json = localStorage.getItem("tasks");
+    const array = JSON.parse(json);
+    this.tasks = Array.isArray(array) ? array : [];
   },
 };
 </script>

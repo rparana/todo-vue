@@ -1,7 +1,7 @@
 <template>
   <div class="new-task">
     <input v-model="name" @keydown.enter="add" type="text" class="form-element" placeholder="Nova tarefa?" >
-    <button @click="add" :disabled="name==''" class="form-element">+</button>
+    <button @click="add" :disabled="name.trim()==''" class="form-element">+</button>
   </div>
 </template>
 
